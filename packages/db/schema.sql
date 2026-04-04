@@ -28,6 +28,7 @@ CREATE TABLE subcontractors (
   email text not null,
   phone text,
   upload_token uuid unique default gen_random_uuid(),
+  deleted_at timestamptz,
   created_at timestamptz default now()
 );
 
@@ -74,4 +75,3 @@ CREATE TABLE audit_logs (
   resource_id text,
   created_at timestamptz default now()
 );
-

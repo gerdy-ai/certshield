@@ -12,11 +12,13 @@ export interface Organization {
 export interface Subcontractor {
   id: string;
   org_id: string;
-  name: string;
+  first_name: string;
+  last_name: string;
   company_name: string;
   email: string;
   phone?: string;
   upload_token: string;
+  deleted_at?: string;
   created_at: string;
 }
 
