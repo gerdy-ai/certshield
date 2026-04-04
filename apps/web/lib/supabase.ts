@@ -1,5 +1,8 @@
 import { auth } from '@clerk/nextjs/server';
-import { createUserClient as createDbUserClient } from '@certshield/db/client';
+import {
+  createServiceRoleSupabaseClient as createDbServiceRoleSupabaseClient,
+  createUserClient as createDbUserClient,
+} from '@certshield/db/client';
 
 export async function createUserClient() {
   const { userId, getToken } = await auth();
@@ -15,4 +18,8 @@ export async function createUserClient() {
   }
 
   return createDbUserClient(token);
+}
+
+export function createServiceRoleClient() {
+  return createDbServiceRoleSupabaseClient();
 }
