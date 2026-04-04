@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "preserve",
+    "resolveJsonModule": true,
+    "allowJs": false,
+    "strict": true,
+    "noImplicitOverride": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@certshield/shared/types": [
+        "./shared/types.ts"
+      ],
+      "@certshield/ai": [
+        "./packages/ai/src/index.ts"
+      ],
+      "@certshield/db": [
+        "./packages/db/client.ts"
+      ],
+      "@certshield/jobs": [
+        "./packages/jobs/inngest.ts"
+      ]
+    }
+  }
+}
+

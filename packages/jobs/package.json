@@ -1,0 +1,26 @@
+{
+  "name": "@certshield/jobs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./inngest.ts",
+  "types": "./inngest.ts",
+  "exports": {
+    ".": {
+      "types": "./inngest.ts",
+      "default": "./inngest.ts"
+    },
+    "./functions": {
+      "types": "./functions.ts",
+      "default": "./functions.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint . --ext .ts --max-warnings=0",
+    "type-check": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "inngest": "^3.31.0"
+  }
+}

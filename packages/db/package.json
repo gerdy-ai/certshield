@@ -1,0 +1,32 @@
+{
+  "name": "@certshield/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./client.ts",
+  "types": "./client.ts",
+  "exports": {
+    ".": {
+      "types": "./client.ts",
+      "default": "./client.ts"
+    },
+    "./client": {
+      "types": "./client.ts",
+      "default": "./client.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint . --ext .ts --max-warnings=0",
+    "type-check": "tsc --noEmit -p tsconfig.json",
+    "seed": "node --loader ts-node/esm seed.ts"
+  },
+  "dependencies": {
+    "next": "^14.2.24",
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.45.4"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2"
+  }
+}
