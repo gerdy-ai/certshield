@@ -13,6 +13,10 @@
     "./client": {
       "types": "./client.ts",
       "default": "./client.ts"
+    },
+    "./schemas": {
+      "types": "./schemas.ts",
+      "default": "./schemas.ts"
     }
   },
   "scripts": {
@@ -24,7 +28,8 @@
   "dependencies": {
     "next": "^14.2.24",
     "@supabase/ssr": "^0.5.2",
-    "@supabase/supabase-js": "^2.45.4"
+    "@supabase/supabase-js": "^2.45.4",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "ts-node": "^10.9.2"

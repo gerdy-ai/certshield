@@ -35,6 +35,16 @@ export function createUserSupabaseClient(): SupabaseClient {
   return createBrowserClient(getSupabaseUrl(), getSupabaseAnonKey());
 }
 
+export function createUserClient(accessToken: string): SupabaseClient {
+  return createClient(getSupabaseUrl(), getSupabaseAnonKey(), {
+    global: {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  });
+}
+
 export async function createServerSupabaseClient(): Promise<SupabaseClient> {
   const { cookies } = await import('next/headers');
   const cookieStore = cookies();
