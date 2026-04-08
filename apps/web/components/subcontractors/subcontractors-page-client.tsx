@@ -18,6 +18,9 @@ import {
   X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useToast } from '@/components/ui/toast';
 import { cn } from '@/lib/utils';
 
 type LatestCertificate = {
@@ -412,10 +415,10 @@ function DrawerContent({
           </div>
 
           {state.status === 'loading' ? (
-            <div className="surface-subtle flex items-center gap-3 px-4 py-6 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Loading certificate details...
-            </div>
+            <div className="space-y-3">
+            <Skeleton className="h-20 w-full" />
+            <Skeleton className="h-20 w-full" />
+          </div>
           ) : null}
 
           {state.status === 'error' ? (
@@ -508,6 +511,7 @@ export function SubcontractorsPageClient({
     data: null,
     error: null,
   });
+  const { pushToast } = useToast();
   const [formValues, setFormValues] = useState<FormState>(initialFormState);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
@@ -556,11 +560,13 @@ export function SubcontractorsPageClient({
         }
       } catch (error) {
         if (!cancelled) {
+          const message = error instanceof Error ? error.message : 'Unable to load subcontractor details.';
           setDetailState({
             status: 'error',
             data: null,
-            error: error instanceof Error ? error.message : 'Unable to load subcontractor details.',
+            error: message,
           });
+          pushToast({ tone: 'error', title: 'Unable to load subcontractor', description: message });
         }
       }
     }
@@ -570,7 +576,7 @@ export function SubcontractorsPageClient({
     return () => {
       cancelled = true;
     };
-  }, [selectedId]);
+  }, [pushToast, selectedId]);
 
   function updateFormValue<Key extends keyof FormState>(key: Key, value: FormState[Key]) {
     setFormValues((current) => ({
@@ -746,11 +752,12 @@ export function SubcontractorsPageClient({
                 </table>
               </div>
             ) : (
-              <div className="px-4 py-10 text-center sm:px-5">
-                <p className="text-sm font-medium text-foreground">No subcontractors yet.</p>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Use the form below to add the first subcontractor and generate their upload link.
-                </p>
+              <div className="px-4 py-8 sm:px-5">
+                <EmptyState
+                  icon={Building2}
+                  title="No subcontractors yet"
+                  description="Use the form below to add your first subcontractor and generate a secure upload link."
+                />
               </div>
             )}
           </div>
@@ -854,7 +861,7 @@ export function SubcontractorsPageClient({
           </section>
         </div>
 
-        <div className="xl:min-h-[640px]">
+        <div className="xl:min-h-[640px] xl:min-w-0">
           {selectedSubcontractor ? (
             <DrawerContent
               item={selectedSubcontractor}

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, Bell, Check, Loader2, Mail, RefreshCw, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { cn } from '@/lib/utils';
 
 type ReminderChannel = 'email' | 'sms';
@@ -459,11 +460,12 @@ export function RemindersPageClient() {
             </div>
           </>
         ) : (
-          <div className="px-4 py-10 text-center sm:px-5">
-            <p className="text-sm font-medium text-foreground">No reminder activity yet.</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Reminder attempts will appear here after daily jobs evaluate expiring certificates.
-            </p>
+          <div className="px-4 py-8 sm:px-5">
+            <EmptyState
+              icon={Bell}
+              title="No reminder activity yet"
+              description="Reminder attempts will appear here after daily jobs evaluate expiring certificates."
+            />
           </div>
         )}
       </div>

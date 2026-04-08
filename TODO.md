@@ -24,6 +24,6 @@
 - [x] F8: Reminders page (log table + settings)
 - [x] F9: Settings + billing pages
 - [x] F10: Marketing landing page
-- [ ] F11: Empty states, loading skeletons, toasts, mobile responsive
+- [x] F11: Empty states, loading skeletons, toasts, mobile responsive
 
-## Current: Frontend F11 next
+## Current: Product spec complete

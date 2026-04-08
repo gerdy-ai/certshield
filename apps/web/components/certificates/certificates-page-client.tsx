@@ -12,6 +12,8 @@ import {
   X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
 type CertificateListItem = {
@@ -488,9 +490,10 @@ export function CertificatesPageClient() {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center gap-3 px-4 py-14 text-sm text-muted-foreground sm:px-5">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Loading certificates from the current workspace.
+          <div className="space-y-3 px-4 py-6 sm:px-5">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
           </div>
         ) : error ? (
           <div className="px-4 py-8 sm:px-5">
@@ -616,14 +619,12 @@ export function CertificatesPageClient() {
             </div>
           </>
         ) : (
-          <div className="px-4 py-12 text-center sm:px-5">
-            <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
-              <CalendarRange className="h-5 w-5" />
-            </span>
-            <p className="mt-4 text-sm font-medium text-foreground">No certificates match these filters.</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Adjust the status or expiration date range to broaden the results.
-            </p>
+          <div className="px-4 py-8 sm:px-5">
+            <EmptyState
+              icon={CalendarRange}
+              title="No certificates match these filters"
+              description="Adjust the status or expiration date range to broaden the results."
+            />
           </div>
         )}
       </section>

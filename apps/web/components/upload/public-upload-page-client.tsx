@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { AlertCircle, CheckCircle2, FileText, Loader2, ShieldCheck, UploadCloud } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/toast';
 import { cn } from '@/lib/utils';
 
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
@@ -39,6 +40,7 @@ export function PublicUploadPageClient({ token }: { token: string }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadState, setUploadState] = useState<UploadState>({ status: 'idle', message: null });
+  const { pushToast } = useToast();
   const isTokenValid = useMemo(() => tokenPattern.test(token), [token]);
 
   function resetInput() {
@@ -108,29 +110,47 @@ export function PublicUploadPageClient({ token }: { token: string }) {
       const payload = (await response.json().catch(() => null)) as UploadResponse | null;
 
       if (!response.ok) {
+        const message = payload?.error ?? 'Upload failed. Please try again.';
         setUploadState({
           status: 'error',
-          message: payload?.error ?? 'Upload failed. Please try again.',
+          message,
+        });
+        pushToast({
+          tone: 'error',
+          title: 'Upload failed',
+          description: message,
         });
         return;
       }
 
+      const message = payload?.message ?? 'Certificate received.';
       setUploadState({
         status: 'success',
-        message: payload?.message ?? 'Certificate received.',
+        message,
+      });
+      pushToast({
+        tone: 'success',
+        title: 'Certificate uploaded',
+        description: message,
       });
       setSelectedFile(null);
       resetInput();
     } catch {
+      const message = 'Network error. Please retry in a moment.';
       setUploadState({
         status: 'error',
-        message: 'Network error. Please retry in a moment.',
+        message,
+      });
+      pushToast({
+        tone: 'error',
+        title: 'Upload failed',
+        description: message,
       });
     }
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-6 py-16">
+    <main className="flex min-h-screen items-center justify-center px-4 py-10 sm:px-6 sm:py-16">
       <section className="surface-card app-shell-shadow w-full max-w-5xl overflow-hidden">
         <div className="grid gap-0 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="bg-primary px-8 py-10 text-primary-foreground lg:px-10 lg:py-12">
