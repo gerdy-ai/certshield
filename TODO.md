@@ -23,7 +23,7 @@
 - [x] F7: Certificates page (filterable table + detail modal)
 - [x] F8: Reminders page (log table + settings)
 - [x] F9: Settings + billing pages
-- [ ] F10: Marketing landing page
+- [x] F10: Marketing landing page
 - [ ] F11: Empty states, loading skeletons, toasts, mobile responsive
 
-## Current: Frontend F10 next
+## Current: Frontend F11 next

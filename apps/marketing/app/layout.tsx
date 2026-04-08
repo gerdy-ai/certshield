@@ -3,8 +3,9 @@ import type { ReactNode } from 'react';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'CertShield Marketing',
-  description: 'Marketing site for CertShield.',
+  title: 'CertShield | COI Tracking For Construction Teams',
+  description:
+    'Track subcontractor certificates of insurance, catch expirations early, and keep construction projects compliant with CertShield.',
 };
 
 export default function RootLayout({
