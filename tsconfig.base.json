@@ -27,13 +27,24 @@
       "@certshield/ai": [
         "./packages/ai/src/index.ts"
       ],
+      "@certshield/ai/parseCert": [
+        "./packages/ai/src/parseCert.ts"
+      ],
       "@certshield/db": [
         "./packages/db/client.ts"
       ],
+      "@certshield/db/client": [
+        "./packages/db/client.ts"
+      ],
+      "@certshield/db/schemas": [
+        "./packages/db/schemas.ts"
+      ],
       "@certshield/jobs": [
         "./packages/jobs/inngest.ts"
+      ],
+      "@certshield/jobs/functions": [
+        "./packages/jobs/functions.ts"
       ]
     }
   }
 }
-

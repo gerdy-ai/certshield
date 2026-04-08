@@ -1,13 +1,16 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": ".",
+    "rootDir": "../..",
     "outDir": "dist",
     "declaration": true,
     "declarationMap": true
   },
   "include": [
-    "*.ts"
+    "*.ts",
+    "../ai/src/**/*.ts",
+    "../db/*.ts",
+    "../../shared/types.ts"
   ]
 }
 

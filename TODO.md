@@ -1,12 +1,12 @@
 # CertShield Build Pipeline
 
 ## Backend (Agent 2 tasks)
-- [ ] B1: Zod schemas + API helpers (packages/db/schemas.ts, auth helpers)
-- [ ] B2: Dashboard stats + subcontractors CRUD routes
-- [ ] B3: Upload route (public, PDF validation, Supabase storage)
-- [ ] B4: Certificates routes + signed URL generation
-- [ ] B5: AI PDF parsing (packages/ai/parseCert.ts)
-- [ ] B6: Inngest jobs (cert/uploaded handler, daily reminders)
+- [x] B1: Zod schemas + API helpers (packages/db/schemas.ts, auth helpers)
+- [x] B2: Dashboard stats + subcontractors CRUD routes
+- [x] B3: Upload route (public, PDF validation, Supabase storage)
+- [x] B4: Certificates routes + signed URL generation
+- [x] B5: AI PDF parsing (packages/ai/parseCert.ts)
+- [x] B6: Inngest jobs (cert/uploaded handler, daily reminders)
 - [ ] B7: Reminders, settings, billing routes
 - [ ] B8: Stripe webhook handler
 - [ ] B9: RLS policies for all tables
@@ -24,4 +24,4 @@
 - [ ] F10: Marketing landing page
 - [ ] F11: Empty states, loading skeletons, toasts, mobile responsive
 
-## Current: B1
+## Current: B7

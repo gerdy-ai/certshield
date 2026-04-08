@@ -21,6 +21,8 @@
     "type-check": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
+    "@certshield/ai": "workspace:*",
+    "@certshield/db": "workspace:*",
     "inngest": "^3.31.0"
   }
 }
