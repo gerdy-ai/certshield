@@ -10,7 +10,7 @@
 - [x] B6: Inngest jobs (cert/uploaded handler, daily reminders)
 - [x] B7: Reminders, settings, billing routes
 - [x] B8: Stripe webhook handler
-- [ ] B9: RLS policies for all tables
+- [x] B9: RLS policies for all tables
 
 ## Frontend (Agent 1 tasks)
 
@@ -26,4 +26,4 @@
 - [ ] F10: Marketing landing page
 - [ ] F11: Empty states, loading skeletons, toasts, mobile responsive
 
-## Current: B9
+## Current: Frontend F1-F11 pending
