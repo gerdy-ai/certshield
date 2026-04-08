@@ -6,6 +6,16 @@ export interface Organization {
   slug: string;
   clerk_org_id: string;
   plan: 'starter' | 'growth' | 'agency';
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  notification_email: string | null;
+  webhook_url: string | null;
+  reminder_30d_email: boolean;
+  reminder_14d_email: boolean;
+  reminder_7d_email: boolean;
+  reminder_30d_sms: boolean;
+  reminder_14d_sms: boolean;
+  reminder_7d_sms: boolean;
   created_at: string;
 }
 
@@ -48,10 +58,12 @@ export interface ReminderLog {
   id: string;
   certificate_id: string;
   subcontractor_id: string;
+  org_id: string;
   reminder_type: 'email' | 'sms';
   days_before_expiry: number;
   sent_at: string;
   success: boolean;
+  error_message: string | null;
 }
 
 export interface ParsedCertFields {

@@ -1,10 +1,33 @@
 import { z } from 'zod';
 
-const certStatusSchema = z.enum(['active', 'expiring_soon', 'expired', 'pending']);
+const certStatusSchema = z.enum([
+  'active',
+  'expiring_soon',
+  'expired',
+  'pending',
+]);
 
 const positiveIntFromQuery = z.coerce.number().int().positive();
 
 const dateStringSchema = z.string().date();
+
+const emptyStringToNull = (value: unknown): unknown => {
+  if (typeof value === 'string' && value.trim() === '') {
+    return null;
+  }
+
+  return value;
+};
+
+const optionalNullableEmailSchema = z.preprocess(
+  emptyStringToNull,
+  z.string().trim().email().nullable().optional(),
+);
+
+const optionalNullableUrlSchema = z.preprocess(
+  emptyStringToNull,
+  z.string().trim().url().nullable().optional(),
+);
 
 export const paginationSchema = z.object({
   page: positiveIntFromQuery.optional().default(1),
@@ -20,8 +43,8 @@ export const createSubcontractorSchema = z.object({
 });
 
 export const updateSettingsSchema = z.object({
-  notification_email: z.string().trim().email().optional(),
-  webhook_url: z.string().trim().url().optional(),
+  notification_email: optionalNullableEmailSchema,
+  webhook_url: optionalNullableUrlSchema,
   reminder_30d_email: z.boolean().optional(),
   reminder_14d_email: z.boolean().optional(),
   reminder_7d_email: z.boolean().optional(),
@@ -41,6 +64,11 @@ export const certificateFilterSchema = z.object({
 export const subcontractorFilterSchema = z.object({
   search: z.string().trim().min(1).max(200).optional(),
   status: certStatusSchema.optional(),
+  page: paginationSchema.shape.page,
+  limit: paginationSchema.shape.limit,
+});
+
+export const reminderLogFilterSchema = z.object({
   page: paginationSchema.shape.page,
   limit: paginationSchema.shape.limit,
 });
