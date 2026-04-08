@@ -17,7 +17,7 @@
 - [x] F1: Design system setup (tailwind config, shadcn theme, global styles)
 - [x] F2: App layout (sidebar, top bar, providers)
 - [x] F3: Dashboard overview page (metric cards + attention table)
-- [ ] F4: Subcontractors list + side drawer
+- [x] F4: Subcontractors list + side drawer
 - [ ] F5: Add subcontractor form + upload link modal
 - [ ] F6: Public upload page (/upload/[token])
 - [ ] F7: Certificates page (filterable table + detail modal)
@@ -26,4 +26,4 @@
 - [ ] F10: Marketing landing page
 - [ ] F11: Empty states, loading skeletons, toasts, mobile responsive
 
-## Current: Frontend F4 next
+## Current: Frontend F5 next
