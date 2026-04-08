@@ -5,10 +5,15 @@ import type { CertStatus } from '../../../../shared/types';
 import {
   AlertTriangle,
   Building2,
+  Check,
   ChevronRight,
+  Copy,
+  ExternalLink,
+  Link as LinkIcon,
   Loader2,
   Mail,
   Phone,
+  Plus,
   ShieldCheck,
   X,
 } from 'lucide-react';
@@ -69,11 +74,46 @@ type SubcontractorDetailResponse = {
   data: SubcontractorDetail;
 };
 
+type CreateSubcontractorResponse = {
+  data: {
+    id: string;
+    org_id: string;
+    first_name: string;
+    last_name: string;
+    company_name: string;
+    email: string;
+    phone?: string;
+    upload_token: string;
+    deleted_at?: string;
+    created_at: string;
+  };
+};
+
+type ErrorResponse = {
+  error?: string;
+};
+
 type DetailState =
   | { status: 'idle'; data: null; error: null }
   | { status: 'loading'; data: null; error: null }
   | { status: 'success'; data: SubcontractorDetail; error: null }
   | { status: 'error'; data: null; error: string };
+
+type FormState = {
+  company_name: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+};
+
+const initialFormState: FormState = {
+  company_name: '',
+  first_name: '',
+  last_name: '',
+  email: '',
+  phone: '',
+};
 
 function formatDisplayName(item: Pick<SubcontractorListItem, 'company_name' | 'first_name' | 'last_name'>) {
   return item.company_name || `${item.first_name} ${item.last_name}`.trim() || 'Unnamed subcontractor';
@@ -131,6 +171,14 @@ function getStatusCopy(status: CertStatus) {
   }
 }
 
+function getUploadUrl(token: string) {
+  if (typeof window === 'undefined') {
+    return `/upload/${token}`;
+  }
+
+  return `${window.location.origin}/upload/${token}`;
+}
+
 function StatusBadge({ status }: { status: CertStatus }) {
   return (
     <span
@@ -144,6 +192,36 @@ function StatusBadge({ status }: { status: CertStatus }) {
     >
       {getStatusCopy(status)}
     </span>
+  );
+}
+
+function Field({
+  children,
+  label,
+  htmlFor,
+}: {
+  children: React.ReactNode;
+  label: string;
+  htmlFor: string;
+}) {
+  return (
+    <label className="space-y-2" htmlFor={htmlFor}>
+      <span className="text-sm font-medium text-foreground">{label}</span>
+      {children}
+    </label>
+  );
+}
+
+function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <input
+      {...props}
+      className={cn(
+        'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm transition-colors',
+        'placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+        props.className,
+      )}
+    />
   );
 }
 
@@ -161,14 +239,103 @@ function EmptyDrawerState() {
   );
 }
 
+function UploadLinkModal({
+  item,
+  onClose,
+}: {
+  item: SubcontractorListItem;
+  onClose: () => void;
+}) {
+  const [copiedValue, setCopiedValue] = useState<'url' | 'token' | null>(null);
+  const uploadUrl = getUploadUrl(item.upload_token);
+
+  useEffect(() => {
+    if (!copiedValue) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => setCopiedValue(null), 1600);
+
+    return () => window.clearTimeout(timeout);
+  }, [copiedValue]);
+
+  async function copyValue(value: string, type: 'url' | 'token') {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedValue(type);
+    } catch {
+      setCopiedValue(null);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <button
+        aria-label="Close upload link dialog"
+        className="absolute inset-0 bg-foreground/35 backdrop-blur-sm"
+        onClick={onClose}
+        type="button"
+      />
+      <div className="app-shell-shadow surface-card relative z-10 w-full max-w-2xl overflow-hidden">
+        <div className="flex items-start justify-between gap-4 border-b border-border/80 px-5 py-5">
+          <div className="space-y-2">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary/80">
+              Upload link
+            </p>
+            <h2 className="text-xl font-semibold tracking-tight text-foreground">
+              {formatDisplayName(item)}
+            </h2>
+            <p className="max-w-xl text-sm leading-6 text-muted-foreground">
+              Share this public upload link with the subcontractor so they can submit a certificate directly.
+            </p>
+          </div>
+          <Button aria-label="Close upload link dialog" size="icon" variant="ghost" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div className="space-y-5 px-5 py-5">
+          <div className="surface-subtle space-y-3 px-4 py-4">
+            <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Public upload URL</p>
+            <p className="break-all text-sm text-foreground">{uploadUrl}</p>
+            <div className="flex flex-wrap gap-3">
+              <Button size="sm" onClick={() => void copyValue(uploadUrl, 'url')}>
+                {copiedValue === 'url' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {copiedValue === 'url' ? 'Copied' : 'Copy URL'}
+              </Button>
+              <Button asChild size="sm" variant="outline">
+                <a href={uploadUrl} rel="noreferrer" target="_blank">
+                  <ExternalLink className="h-4 w-4" />
+                  Open page
+                </a>
+              </Button>
+            </div>
+          </div>
+
+          <div className="surface-subtle space-y-3 px-4 py-4">
+            <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Upload token</p>
+            <p className="break-all font-mono text-xs text-foreground">{item.upload_token}</p>
+            <Button size="sm" variant="outline" onClick={() => void copyValue(item.upload_token, 'token')}>
+              {copiedValue === 'token' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              {copiedValue === 'token' ? 'Copied' : 'Copy token'}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function DrawerContent({
   item,
   state,
   onClose,
+  onOpenUploadModal,
 }: {
   item: SubcontractorListItem;
   state: DetailState;
   onClose: () => void;
+  onOpenUploadModal: () => void;
 }) {
   return (
     <aside className="surface-card flex h-full flex-col overflow-hidden">
@@ -192,6 +359,10 @@ function DrawerContent({
             <span className="inline-flex items-center rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
               Added {formatDate(item.created_at)}
             </span>
+            <Button size="sm" variant="outline" onClick={onOpenUploadModal}>
+              <LinkIcon className="h-4 w-4" />
+              Upload link
+            </Button>
           </div>
         </div>
         <Button aria-label="Close detail panel" size="icon" variant="ghost" onClick={onClose}>
@@ -330,16 +501,32 @@ export function SubcontractorsPageClient({
 }: {
   subcontractors: SubcontractorListItem[];
 }) {
+  const [roster, setRoster] = useState(subcontractors);
   const [selectedId, setSelectedId] = useState<string | null>(subcontractors[0]?.id ?? null);
   const [detailState, setDetailState] = useState<DetailState>({
     status: 'idle',
     data: null,
     error: null,
   });
+  const [formValues, setFormValues] = useState<FormState>(initialFormState);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [formSuccess, setFormSuccess] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadModalId, setUploadModalId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setRoster(subcontractors);
+    setSelectedId((current) => current ?? subcontractors[0]?.id ?? null);
+  }, [subcontractors]);
 
   const selectedSubcontractor = useMemo(
-    () => subcontractors.find((item) => item.id === selectedId) ?? null,
-    [selectedId, subcontractors],
+    () => roster.find((item) => item.id === selectedId) ?? null,
+    [roster, selectedId],
+  );
+
+  const uploadModalItem = useMemo(
+    () => roster.find((item) => item.id === uploadModalId) ?? null,
+    [roster, uploadModalId],
   );
 
   useEffect(() => {
@@ -385,128 +572,305 @@ export function SubcontractorsPageClient({
     };
   }, [selectedId]);
 
+  function updateFormValue<Key extends keyof FormState>(key: Key, value: FormState[Key]) {
+    setFormValues((current) => ({
+      ...current,
+      [key]: value,
+    }));
+  }
+
+  async function handleCreateSubcontractor(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setFormError(null);
+    setFormSuccess(null);
+    setIsSubmitting(true);
+
+    const payload = {
+      company_name: formValues.company_name.trim(),
+      first_name: formValues.first_name.trim(),
+      last_name: formValues.last_name.trim(),
+      email: formValues.email.trim(),
+      ...(formValues.phone.trim() ? { phone: formValues.phone.trim() } : {}),
+    };
+
+    try {
+      const response = await fetch('/api/subcontractors', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = (await response.json().catch(() => null)) as CreateSubcontractorResponse | ErrorResponse | null;
+
+      if (!response.ok || !result || !('data' in result)) {
+        throw new Error(result && 'error' in result && result.error ? result.error : 'Unable to create subcontractor.');
+      }
+
+      const createdItem: SubcontractorListItem = {
+        id: result.data.id,
+        company_name: result.data.company_name,
+        first_name: result.data.first_name,
+        last_name: result.data.last_name,
+        email: result.data.email,
+        created_at: result.data.created_at,
+        upload_token: result.data.upload_token,
+        latest_certificate_status: 'pending',
+        latest_certificate: null,
+        ...(result.data.phone ? { phone: result.data.phone } : {}),
+      };
+
+      setRoster((current) => [createdItem, ...current]);
+      setSelectedId(createdItem.id);
+      setUploadModalId(createdItem.id);
+      setFormValues(initialFormState);
+      setFormSuccess('Subcontractor created. Share the upload link to collect the first certificate.');
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : 'Unable to create subcontractor.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   return (
-    <section className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.9fr)]">
-      <div className="surface-card overflow-hidden">
-        <div className="flex flex-col gap-4 border-b border-border/80 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
-          <div className="space-y-1">
-            <h2 className="text-lg font-semibold text-foreground">Subcontractor roster</h2>
-            <p className="text-sm leading-6 text-muted-foreground">
-              Live workspace records with certificate status pulled from the current backend data model.
-            </p>
+    <>
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.9fr)]">
+        <div className="space-y-6">
+          <div className="surface-card overflow-hidden">
+            <div className="flex flex-col gap-4 border-b border-border/80 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
+              <div className="space-y-1">
+                <h2 className="text-lg font-semibold text-foreground">Subcontractor roster</h2>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  Live workspace records with certificate status pulled from the current backend data model.
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                {selectedSubcontractor ? (
+                  <Button size="sm" variant="outline" onClick={() => setUploadModalId(selectedSubcontractor.id)}>
+                    <LinkIcon className="h-4 w-4" />
+                    Upload link
+                  </Button>
+                ) : null}
+                <div className="rounded-md bg-secondary px-3 py-2 text-left sm:text-right">
+                  <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Active records</p>
+                  <p className="text-lg font-semibold text-foreground">{roster.length}</p>
+                </div>
+              </div>
+            </div>
+
+            {roster.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-left">
+                  <thead className="bg-muted/50">
+                    <tr>
+                      <th className="px-4 py-3 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground sm:px-5">
+                        Subcontractor
+                      </th>
+                      <th className="px-4 py-3 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground sm:px-5">
+                        Contact
+                      </th>
+                      <th className="px-4 py-3 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground sm:px-5">
+                        Certificate
+                      </th>
+                      <th className="px-4 py-3 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground sm:px-5">
+                        Activity
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {roster.map((item) => {
+                      const selected = item.id === selectedId;
+
+                      return (
+                        <tr
+                          key={item.id}
+                          className={cn(
+                            'border-t border-border/80 transition-colors',
+                            selected ? 'bg-primary/[0.05]' : 'hover:bg-background/70',
+                          )}
+                        >
+                          <td className="px-4 py-4 align-top sm:px-5">
+                            <button
+                              className="group flex w-full items-start justify-between gap-4 text-left"
+                              type="button"
+                              onClick={() => setSelectedId(item.id)}
+                            >
+                              <div className="space-y-1">
+                                <p className="text-sm font-medium text-foreground">
+                                  {formatDisplayName(item)}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  {`${item.first_name} ${item.last_name}`.trim() || 'No contact name'}
+                                </p>
+                              </div>
+                              <ChevronRight
+                                className={cn(
+                                  'mt-0.5 h-4 w-4 shrink-0 text-muted-foreground transition-transform',
+                                  selected ? 'translate-x-0.5 text-primary' : 'group-hover:translate-x-0.5',
+                                )}
+                              />
+                            </button>
+                          </td>
+                          <td className="px-4 py-4 align-top text-sm text-muted-foreground sm:px-5">
+                            <div className="space-y-1">
+                              <p>{item.email}</p>
+                              <p>{item.phone ?? 'No phone provided'}</p>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 align-top sm:px-5">
+                            <div className="space-y-2">
+                              <StatusBadge status={item.latest_certificate_status} />
+                              <p className="text-sm text-muted-foreground">
+                                {item.latest_certificate
+                                  ? `Expires ${formatDateOnly(item.latest_certificate.expiration_date)}`
+                                  : 'No certificate uploaded yet'}
+                              </p>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 align-top text-sm text-muted-foreground sm:px-5">
+                            <div className="space-y-1">
+                              <p>Created {formatDate(item.created_at)}</p>
+                              <p>
+                                {item.latest_certificate
+                                  ? `Uploaded ${formatDate(item.latest_certificate.uploaded_at)}`
+                                  : 'Awaiting first upload'}
+                              </p>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="px-4 py-10 text-center sm:px-5">
+                <p className="text-sm font-medium text-foreground">No subcontractors yet.</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Use the form below to add the first subcontractor and generate their upload link.
+                </p>
+              </div>
+            )}
           </div>
-          <div className="rounded-md bg-secondary px-3 py-2 text-left sm:text-right">
-            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Active records</p>
-            <p className="text-lg font-semibold text-foreground">{subcontractors.length}</p>
-          </div>
+
+          <section className="surface-card p-5">
+            <div className="flex items-start gap-3">
+              <span className="flex h-11 w-11 items-center justify-center rounded-md bg-secondary text-secondary-foreground">
+                <Plus className="h-5 w-5" />
+              </span>
+              <div className="space-y-1">
+                <h2 className="text-lg font-semibold text-foreground">Add subcontractor</h2>
+                <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+                  Create a workspace record and immediately expose the public upload link for certificate collection.
+                </p>
+              </div>
+            </div>
+
+            <form className="mt-5 space-y-4" onSubmit={handleCreateSubcontractor}>
+              <div className="grid gap-4 md:grid-cols-2">
+                <Field htmlFor="company_name" label="Company name">
+                  <Input
+                    id="company_name"
+                    maxLength={200}
+                    name="company_name"
+                    placeholder="North Ridge Electrical"
+                    required
+                    value={formValues.company_name}
+                    onChange={(event) => updateFormValue('company_name', event.target.value)}
+                  />
+                </Field>
+                <Field htmlFor="email" label="Email">
+                  <Input
+                    id="email"
+                    maxLength={320}
+                    name="email"
+                    placeholder="insurance@northridge.example"
+                    required
+                    type="email"
+                    value={formValues.email}
+                    onChange={(event) => updateFormValue('email', event.target.value)}
+                  />
+                </Field>
+                <Field htmlFor="first_name" label="First name">
+                  <Input
+                    id="first_name"
+                    maxLength={100}
+                    name="first_name"
+                    placeholder="Avery"
+                    required
+                    value={formValues.first_name}
+                    onChange={(event) => updateFormValue('first_name', event.target.value)}
+                  />
+                </Field>
+                <Field htmlFor="last_name" label="Last name">
+                  <Input
+                    id="last_name"
+                    maxLength={100}
+                    name="last_name"
+                    placeholder="Brooks"
+                    required
+                    value={formValues.last_name}
+                    onChange={(event) => updateFormValue('last_name', event.target.value)}
+                  />
+                </Field>
+                <Field htmlFor="phone" label="Phone">
+                  <Input
+                    id="phone"
+                    maxLength={50}
+                    name="phone"
+                    placeholder="(555) 867-5309"
+                    value={formValues.phone}
+                    onChange={(event) => updateFormValue('phone', event.target.value)}
+                  />
+                </Field>
+              </div>
+
+              {formError ? (
+                <div className="surface-subtle flex items-start gap-3 border-destructive/20 px-4 py-3 text-sm text-destructive">
+                  <AlertTriangle className="mt-0.5 h-4 w-4" />
+                  <p>{formError}</p>
+                </div>
+              ) : null}
+
+              {formSuccess ? (
+                <div className="surface-subtle flex items-start gap-3 border-emerald-200 px-4 py-3 text-sm text-emerald-800">
+                  <Check className="mt-0.5 h-4 w-4" />
+                  <p>{formSuccess}</p>
+                </div>
+              ) : null}
+
+              <div className="flex flex-wrap items-center gap-3">
+                <Button disabled={isSubmitting} type="submit">
+                  {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                  {isSubmitting ? 'Creating subcontractor...' : 'Add subcontractor'}
+                </Button>
+                <p className="text-sm text-muted-foreground">
+                  Required fields follow the existing `POST /api/subcontractors` contract.
+                </p>
+              </div>
+            </form>
+          </section>
         </div>
 
-        {subcontractors.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-left">
-              <thead className="bg-muted/50">
-                <tr>
-                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground sm:px-5">
-                    Subcontractor
-                  </th>
-                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground sm:px-5">
-                    Contact
-                  </th>
-                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground sm:px-5">
-                    Certificate
-                  </th>
-                  <th className="px-4 py-3 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground sm:px-5">
-                    Activity
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {subcontractors.map((item) => {
-                  const selected = item.id === selectedId;
+        <div className="xl:min-h-[640px]">
+          {selectedSubcontractor ? (
+            <DrawerContent
+              item={selectedSubcontractor}
+              state={detailState}
+              onClose={() => setSelectedId(null)}
+              onOpenUploadModal={() => setUploadModalId(selectedSubcontractor.id)}
+            />
+          ) : (
+            <EmptyDrawerState />
+          )}
+        </div>
+      </section>
 
-                  return (
-                    <tr
-                      key={item.id}
-                      className={cn(
-                        'border-t border-border/80 transition-colors',
-                        selected ? 'bg-primary/[0.05]' : 'hover:bg-background/70',
-                      )}
-                    >
-                      <td className="px-4 py-4 align-top sm:px-5">
-                        <button
-                          className="group flex w-full items-start justify-between gap-4 text-left"
-                          type="button"
-                          onClick={() => setSelectedId(item.id)}
-                        >
-                          <div className="space-y-1">
-                            <p className="text-sm font-medium text-foreground">
-                              {formatDisplayName(item)}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {`${item.first_name} ${item.last_name}`.trim() || 'No contact name'}
-                            </p>
-                          </div>
-                          <ChevronRight
-                            className={cn(
-                              'mt-0.5 h-4 w-4 shrink-0 text-muted-foreground transition-transform',
-                              selected ? 'translate-x-0.5 text-primary' : 'group-hover:translate-x-0.5',
-                            )}
-                          />
-                        </button>
-                      </td>
-                      <td className="px-4 py-4 align-top text-sm text-muted-foreground sm:px-5">
-                        <div className="space-y-1">
-                          <p>{item.email}</p>
-                          <p>{item.phone ?? 'No phone provided'}</p>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 align-top sm:px-5">
-                        <div className="space-y-2">
-                          <StatusBadge status={item.latest_certificate_status} />
-                          <p className="text-sm text-muted-foreground">
-                            {item.latest_certificate
-                              ? `Expires ${formatDateOnly(item.latest_certificate.expiration_date)}`
-                              : 'No certificate uploaded yet'}
-                          </p>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 align-top text-sm text-muted-foreground sm:px-5">
-                        <div className="space-y-1">
-                          <p>Created {formatDate(item.created_at)}</p>
-                          <p>
-                            {item.latest_certificate
-                              ? `Uploaded ${formatDate(item.latest_certificate.uploaded_at)}`
-                              : 'Awaiting first upload'}
-                          </p>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="px-4 py-10 text-center sm:px-5">
-            <p className="text-sm font-medium text-foreground">No subcontractors yet.</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              F4 adds the roster and detail workflow only. Creation flows remain in the next frontend task.
-            </p>
-          </div>
-        )}
-      </div>
-
-      <div className="xl:min-h-[640px]">
-        {selectedSubcontractor ? (
-          <DrawerContent
-            item={selectedSubcontractor}
-            state={detailState}
-            onClose={() => setSelectedId(null)}
-          />
-        ) : (
-          <EmptyDrawerState />
-        )}
-      </div>
-    </section>
+      {uploadModalItem ? (
+        <UploadLinkModal item={uploadModalItem} onClose={() => setUploadModalId(null)} />
+      ) : null}
+    </>
   );
 }
