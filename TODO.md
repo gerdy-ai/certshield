@@ -19,11 +19,11 @@
 - [x] F3: Dashboard overview page (metric cards + attention table)
 - [x] F4: Subcontractors list + side drawer
 - [x] F5: Add subcontractor form + upload link modal
-- [ ] F6: Public upload page (/upload/[token])
+- [x] F6: Public upload page (/upload/[token])
 - [ ] F7: Certificates page (filterable table + detail modal)
 - [ ] F8: Reminders page (log table + settings)
 - [ ] F9: Settings + billing pages
 - [ ] F10: Marketing landing page
 - [ ] F11: Empty states, loading skeletons, toasts, mobile responsive
 
-## Current: Frontend F6 next
+## Current: Frontend F7 next
