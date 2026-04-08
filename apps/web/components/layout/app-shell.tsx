@@ -27,13 +27,18 @@ type AppShellContextValue = {
 
 const AppShellContext = createContext<AppShellContextValue | null>(null);
 
-const navigation = [
+const navigation: Array<{
+  href: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  disabled?: boolean;
+}> = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/subcontractors', label: 'Subcontractors', icon: Users },
   { href: '/certificates', label: 'Certificates', icon: ShieldCheck },
   { href: '/reminders', label: 'Reminders', icon: Bell },
-  { href: '/billing', label: 'Billing', icon: CreditCard, disabled: true },
-  { href: '/settings', label: 'Settings', icon: Settings, disabled: true },
+  { href: '/billing', label: 'Billing', icon: CreditCard },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
 function useAppShell() {

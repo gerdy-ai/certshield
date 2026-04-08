@@ -22,8 +22,8 @@
 - [x] F6: Public upload page (/upload/[token])
 - [x] F7: Certificates page (filterable table + detail modal)
 - [x] F8: Reminders page (log table + settings)
-- [ ] F9: Settings + billing pages
+- [x] F9: Settings + billing pages
 - [ ] F10: Marketing landing page
 - [ ] F11: Empty states, loading skeletons, toasts, mobile responsive
 
-## Current: Frontend F9 next
+## Current: Frontend F10 next
