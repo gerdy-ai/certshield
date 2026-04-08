@@ -31,7 +31,7 @@ const navigation = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/subcontractors', label: 'Subcontractors', icon: Users },
   { href: '/certificates', label: 'Certificates', icon: ShieldCheck },
-  { href: '/reminders', label: 'Reminders', icon: Bell, disabled: true },
+  { href: '/reminders', label: 'Reminders', icon: Bell },
   { href: '/billing', label: 'Billing', icon: CreditCard, disabled: true },
   { href: '/settings', label: 'Settings', icon: Settings, disabled: true },
 ];
